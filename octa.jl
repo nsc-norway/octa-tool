@@ -49,6 +49,7 @@ function analyse(sample_indexes, unknown_indexes, unknown_total_reads)
             ] 
     feasible = length(combinations) > length(sample_indexes)
     if ! feasible
+        println("Sorry, all possible combinations have been used")
         return nothing
     end
 
@@ -100,7 +101,7 @@ function main(path)
 
     lanes = Set(map(coordinates -> coordinates[1], keys(read_counts)))
 
-    for lane = lanes
+    for lane = lanes # TODO sort
         result = nothing
         if in(lane, lanes_with_dual_indexing)
             unknown_barcodes_raw = get_unknown_barcodes(stats_dir, lane)
@@ -128,5 +129,5 @@ function main(path)
     
 end
 
-main("/home/fa2k/nsc/statfiles/170113_NB501273_0042_AHTKM2BGXY")
+main("/home/fa2k/nsc/statfiles/1612/161228_D00132_0217_ACAJEMANXX")
 
