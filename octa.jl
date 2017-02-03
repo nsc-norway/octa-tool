@@ -9,7 +9,7 @@ function get_unknown_barcodes(stats_dir, lane)
             if found_unknown_bc_section
                 if ! startswith(line, "###")
                     (barcode, count_str) = split(line, "\t")
-                    unknown_barcode_count[barcode] = count_str
+                    unknown_barcode_count[barcode] = parse(Int64, count_str)
                 end
             elseif strip(line) == "### Most Popular Unknown Index Sequences"
                 found_unknown_bc_section = true
@@ -49,7 +49,7 @@ function analyse(sample_indexes, unknown_indexes, unknown_total_reads)
             ] 
     feasible = length(combinations) > length(sample_indexes)
     if ! feasible
-        println("Sorry, all possible combinations have been used")
+        #println("Sorry, all possible combinations have been used")
         return nothing
     end
 
@@ -73,7 +73,10 @@ function analyse(sample_indexes, unknown_indexes, unknown_total_reads)
             end
         end
     end
-    return in_misassigned, in_known_samples
+
+    single_misassign_rate = in_misassigned / (in_misassigned + in_known_samples)
+
+    return in_known_samples+in_misassigned, in_misassigned, single_misassign_rate
 end
 
 
@@ -101,7 +104,13 @@ function main(path)
 
     lanes = Set(map(coordinates -> coordinates[1], keys(read_counts)))
 
-    for lane = lanes # TODO sort
+    # TODO make array from set how?
+    lanes_array = []
+    for x = lanes
+        push!(lanes_array, x)
+    end
+
+    for lane = sort(lanes_array)
         result = nothing
         if in(lane, lanes_with_dual_indexing)
             unknown_barcodes_raw = get_unknown_barcodes(stats_dir, lane)
@@ -121,13 +130,35 @@ function main(path)
             result = analyse(lane_read_counts, unknown_barcodes, unknown_total_reads)
         end
         if result != nothing
-            println(lane, "RESULT: ", result)
+            println(lane, join(result)
         else
-            println(lane, "\tNA\tNA")
+            println(lane, "\tNO_DATA")
         end
     end
     
 end
 
-main("/home/fa2k/nsc/statfiles/1612/161228_D00132_0217_ACAJEMANXX")
+runs = [
+    "1612/161201_M02980_0077_000000000-AKMWW",
+    "1612/161201_M01334_0111_000000000-AT0A7",
+    "1612/161208_D00132_0213_ACAAR6ANXX",
+    "1612/161208_D00132_0214_BCAC1DANXX",
+    "1612/161209_NS500336_0150_AHLWNHBGXY",
+    "1612/161214_NB501273_0039_AHLWTTBGXY",
+    "1612/161216_J00146_0014_AH7YM2BBXX",
+    "1612/161219_J00146_0015_AH7YLKBBXX",
+    "1612/161219_M01334_0112_000000000-ARV4F",
+    "1612/161220_M02980_0079_000000000-AKJVG",
+    "1612/161228_D00132_0217_ACAJEMANXX",
+    "170111_D00132_0218_ACAHFEANXX",
+    "170113_NB501273_0042_AHTKM2BGXY",
+    "170113_NS500336_0155_AHTCTTBGXY",
+    "1701/170112_NS500336_0154_AHTCKCBGXY"
+    ]
+
+for run = runs
+    mypath = joinpath("/home/fa2k/nsc/statfiles", run)
+    println("RUN: ", mypath)
+    main(mypath)
+end
 
