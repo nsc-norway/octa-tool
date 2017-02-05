@@ -130,7 +130,7 @@ function main(path)
             result = analyse(lane_read_counts, unknown_barcodes, unknown_total_reads)
         end
         if result != nothing
-            println(lane, join(result))
+            println(lane, "\t", join(result, "\t"))
         else
             println(lane, "\tNO_DATA")
         end
