@@ -75,10 +75,11 @@ function analyse(run, lane, sample_indexes, unknown_indexes, unknown_total_reads
 
     undetermined_pct = unknown_total_reads * 100.0 / (unknown_total_reads + in_known_samples)
 
-    @printf("%4.1f\n", undetermined_pct)
-    println("Actually ", unknown_total_reads, " out of ", unknown_total_reads + in_known_samples)
+    @printf("%4.1f\t%4.1f\n", undetermined_pct, single_misassign_rate)
 end
 
+# Global scope
+println("RUN_ID\tLANE\tUndet%\tSingleMisID%\t")
 
 function process_path(path)
     if isdir(path)
@@ -135,6 +136,7 @@ function main(path)
     
 end
 
+
 runs = [
     "1612/161201_M02980_0077_000000000-AKMWW",
     "1612/161201_M01334_0111_000000000-AT0A7",
@@ -153,9 +155,7 @@ runs = [
     "1701/170112_NS500336_0154_AHTCKCBGXY"
     ]
 
-println("RUN_ID\tLANE\tUndet%\t\t")
 for run = runs
     mypath = joinpath("/home/fa2k/nsc/statfiles", run)
     main(mypath)
 end
-
