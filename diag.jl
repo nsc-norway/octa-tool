@@ -86,7 +86,7 @@ function analyse(run, lane, sample_indexes, unknown_indexes, unknown_total_reads
 end
 
 # Global scope
-println("RUN_ID\tLANE\tUndet%\tSingleMisID%\tSmisIdAny%")
+###println("RUN_ID\tLANE\tUndet%\tSingleMisID%\tSmisIdAny%")
 
 function process_path(path)
     if isdir(path)
@@ -101,7 +101,7 @@ end
 
 function main(path)
     stats_dir = process_path(path)
-    runid = splitdir(path)[2]
+    runid = splitdir(rstrip(path, ['/']))[2]
 
     (read_counts, perfect_read_counts) = get_demultiplexing_stats(stats_dir)
     lanes_with_dual_indexing = []
@@ -143,15 +143,5 @@ function main(path)
     
 end
 
+main(ARGS[1])
 
-runs = [
-    "1612/161201_M01334_0111_000000000-AT0A7",
-    "1612/161209_NS500336_0150_AHLWNHBGXY",
-    "1612/161214_NB501273_0039_AHLWTTBGXY",
-    "1612/161216_J00146_0014_AH7YM2BBXX",
-    ]
-
-for run = runs
-    mypath = joinpath("/Volumes/seqArchive/completed", run)
-    main(mypath)
-end
