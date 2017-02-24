@@ -61,6 +61,7 @@ function analyse(run, lane, sample_indexes, unknown_indexes, unknown_total_reads
     # the other
     in_known_samples = 0
     in_misassigned = 0
+    single_known_any = 0
     for index_seq = sample_single_indexes[1]
         # Compute the number of known, unknown reads for this fixed
         # single index
@@ -70,12 +71,16 @@ function analyse(run, lane, sample_indexes, unknown_indexes, unknown_total_reads
             in_misassigned += get(unknown_indexes, key, 0)
         end
     end
+    for ((index1, index2), count) = unknown_indexes
+        # ...
+    end
 
-    single_misassign_rate = in_misassigned / (in_misassigned + in_known_samples)
+    single_misassign_rate = in_misassigned * 100.0 / (in_misassigned + in_known_samples)
+    x_junk = in_misassigned / (in_misassigned + in_known_samples)
 
     undetermined_pct = unknown_total_reads * 100.0 / (unknown_total_reads + in_known_samples)
 
-    @printf("%4.1f\t%4.1f\n", undetermined_pct, single_misassign_rate)
+    @printf("%4.1f\t%5.2f\n", undetermined_pct, single_misassign_rate)
 end
 
 # Global scope
