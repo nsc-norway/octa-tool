@@ -1,5 +1,10 @@
 # OCTA TOOL -- The Opportunistic Cross-Talk Assessment tool
 
+# Warning: Experimental repository
+* This is not a complete program, and it's not ready for use yet, not 
+even for testing. So far, this repo is more of a notebook, not for
+public use.*
+
 This program reads the statistics from Illumina's demultiplexing
 tool bcl2fastq (version 2.17 and above), and makes an estimate of
 the sample cross-talk (mis-assignment rate).
