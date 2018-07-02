@@ -62,13 +62,21 @@ function analyse(run, lane, sample_indexes, unknown_indexes, unknown_total_reads
     in_known_samples = 0
     in_misassigned = 0
     single_known_any = 0
+    udi = true
     for index_seq = sample_single_indexes[1]
         # Compute the number of known, unknown reads for this fixed
         # single index
+        icount = 0
         for other_index_seq = sample_single_indexes[2]
             key = [index_seq, other_index_seq]
+            if in(key, keys(sample_indexes))
+                icount += 1
+            end
             in_known_samples += get(sample_indexes, key, 0)
             in_misassigned += get(unknown_indexes, key, 0)
+        end
+        if icount > 1
+            udi = false
         end
     end
     in_misassigned_any = 0
@@ -83,11 +91,12 @@ function analyse(run, lane, sample_indexes, unknown_indexes, unknown_total_reads
 
     undetermined_pct = unknown_total_reads * 100.0 / (unknown_total_reads + in_known_samples)
 
-    @printf("%4.1f\t%6.3f\t%6.3f\n", undetermined_pct, single_misassign_rate, single_misassign_rate_any)
+    @printf("%4.1f\t%6.3f\t%6.3f\t%d\n", undetermined_pct, single_misassign_rate, single_misassign_rate_any, udi)
 end
 
+
 # Global scope
-###println("RUN_ID\tLANE\tUndet%\tSingleMisID%\tSmisIdAny%")
+println("RUN_ID\tLANE\tUndet\tSingleMisID\tSmisIdAny\tUDI")
 
 function process_path(path)
     if isdir(path)
@@ -104,7 +113,12 @@ function main(path)
     stats_dir = process_path(path)
     runid = splitdir(rstrip(path, ['/']))[2]
 
-    (read_counts, perfect_read_counts) = get_demultiplexing_stats(stats_dir)
+    (read_counts, perfect_read_counts) =
+        try
+            get_demultiplexing_stats(stats_dir)
+        catch
+            return
+        end
     lanes_with_dual_indexing = []
     for (lane, barcode) = keys(read_counts)
         if (contains(barcode, "+") || contains(barcode, "-"))
@@ -144,5 +158,8 @@ function main(path)
     
 end
 
-main(ARGS[1])
+for path = ARGS
+    main(path)
+end
+
 
